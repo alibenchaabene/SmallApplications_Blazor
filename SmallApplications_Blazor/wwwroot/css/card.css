@@ -1,0 +1,15 @@
+﻿
+.lp-app-grid {
+    display: grid;
+    gap: 15px;
+    grid-template-columns: repeat(auto-fit,minmax(600px,1fr));
+    padding-top: 24px
+}
+
+
+.flex {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    position: relative;
+}
