@@ -1,11 +1,13 @@
 ﻿@page "/Beginner/romanToDecimal"
+@using SmallApplications_Blazor.ViewModels.Beginner;
 
 <PageTitle>RomanToDecimal</PageTitle>
 
 <MudAlert Severity="Severity.Info" Elevation="5">
 	Roman to Decimal takes numbers represented as roman numerals from input strings
 	and converts them to their decimal value.
-</MudAlert><br />
+</MudAlert>
+<br />
 <MudAlert Severity="Severity.Info" Elevation="5">
 	Roman to Decimal allows the user to enter strings of decimal number and
 	then displays its roman equivalent.
@@ -16,76 +18,37 @@
 		<MudTextField T="string"
 					  Label="Roman Numeral"
 					  Placeholder="Enter roman numeral"
-					  @bind-Value="Roman" />
+					  @bind-Value="vm.Roman" />
 		<MudTextField T="string"
 					  Label="Decimal"
 					  Placeholder="Enter decimal number"
-					  @bind-Value="Decimal" />
+					  @bind-Value="vm.Decimal" />
 		<MudButton Class="mt-5"
 				   Variant="Variant.Filled"
 				   Color="Color.Primary"
-				   OnClick="ConvertDecimal">
+				   OnClick="vm.ConvertDecimal">
 			Convert to Decimal
 		</MudButton>
 		<MudButton Class="mt-5"
 				   Variant="Variant.Filled"
 				   Color="Color.Secondary"
-				   OnClick="ConvertRoman">
+				   OnClick="vm.ConvertRoman">
 			Convert to Roman
 		</MudButton>
 		<MudButton Class="mt-5"
 				   Variant="Variant.Filled"
-				   OnClick="Reset">
+				   OnClick="vm.Reset">
 			Reset
 		</MudButton>
 	</MudPaper>
 </div>
+@if (vm.HasError)
+{
+	<MudAlert Class="mb-6 mt-5"
+		  Severity="Severity.Error"
+		  Elevation="20"
+		  Variant="Variant.Filled">@vm.ReturnMessage</MudAlert>
+}
 @code {
-
-	public string Roman = string.Empty;
-	public string Decimal = string.Empty;
-
-	public void ConvertRoman()
-	{
-		try
-		{
-			if (string.IsNullOrEmpty(Decimal)) throw new FormatException();
-			var number = Convert.ToInt32(Decimal);
-			Roman = RomanNumeral.FromDecimal(number).Value;
-			ShowAlert("Converted with success", Severity.Success);
-		}
-		catch
-		{
-			ShowAlert("Decimal must be a valid number with digits 0-9.", Severity.Error);
-		}
-	}
-
-	public void ConvertDecimal()
-	{
-		try
-		{
-			if (string.IsNullOrEmpty(Roman)) throw new FormatException();
-			Decimal = new RomanNumeral(Roman).ToInt().ToString();
-			ShowAlert("Converted with success", Severity.Success);
-		}
-		catch
-		{
-			ShowAlert("Roman numerals only support the following characters: I, V, X, L, C, D, M.", Severity.Error);
-		}
-	}
-
-	void ShowAlert(string message, Severity severity)
-	{
-		_snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
-		_snackbar.Add(message, severity, config =>
-		{
-			config.ShowCloseIcon = true;
-		});
-	}
-
-	void Reset()
-	{
-		Decimal = string.Empty;
-		Roman = string.Empty;
-	}
+	public RomanToDecimalConverterViewModel vm = new RomanToDecimalConverterViewModel();
 }

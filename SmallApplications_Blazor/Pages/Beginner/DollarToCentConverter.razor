@@ -1,10 +1,12 @@
 ﻿@page "/Beginner/dollarToCent"
+@using SmallApplications_Blazor.ViewModels.Beginner;
 
 <PageTitle>DollarToCent</PageTitle>
 
 <MudAlert Severity="Severity.Info" Elevation="5">
-Dollars to Cents allows user to enter a dollar value and then displays the total cents.
-And how many were pennies, nickels, quarters and dimes from the total cents</MudAlert>
+	Dollars to Cents allows user to enter a dollar value and then displays the total cents.
+	And how many were pennies, nickels, quarters and dimes from the total cents
+</MudAlert>
 <br />
 <MudGrid>
 	<MudItem xs="12" sm="7">
@@ -12,23 +14,23 @@ And how many were pennies, nickels, quarters and dimes from the total cents</Mud
 			<MudTextField T="string"
 						  Label="Dollar value"
 						  Placeholder="Enter dollar value"
-						  @bind-Value="DollarValue" />
+						  @bind-Value="vm.DollarValue" />
 			<MudButton Class="mt-5"
 					   Variant="Variant.Filled"
 					   Color="Color.Secondary"
-					   OnClick="Convert">
+					   OnClick="vm.Convert">
 				Convert to Cents
 			</MudButton>
 			<MudButton Class="mt-5"
 					   Variant="Variant.Filled"
-					   OnClick="Reset">
+					   OnClick="vm.Reset">
 				Reset
 			</MudButton>
 		</MudPaper>
 	</MudItem>
 	<MudItem xs="12" sm="5">
 		<MudPaper Class="pa-4 mud-height-full" Elevation="5" MaxHeight="100%">
-			<MudText Typo="Typo.h6">Result: @Cents cents</MudText>
+			<MudText Typo="Typo.h6">Result: @vm.Cents cents</MudText>
 			<MudSimpleTable Striped="true" Style="overflow-x: auto;">
 				<thead>
 					<tr>
@@ -37,66 +39,25 @@ And how many were pennies, nickels, quarters and dimes from the total cents</Mud
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var coin in CoinResults)
+					@foreach (var coin in vm.CoinResults)
 					{
-							<tr>
-								<td>@coin.DisplayName</td>
-								<td class="text-center">@coin.Amount</td>
-							</tr>
+						<tr>
+							<td>@coin.DisplayName</td>
+							<td class="text-center">@coin.Amount</td>
+						</tr>
 					}
 				</tbody>
 			</MudSimpleTable>
 		</MudPaper>
 	</MudItem>
 </MudGrid>
+@if (vm.HasError)
+{
+	<MudAlert Class="mb-6 mt-5"
+		  Severity="Severity.Error"
+		  Elevation="20"
+		  Variant="Variant.Filled">@vm.ReturnMessage</MudAlert>
+}
 @code {
-
-	public string DollarValue { get; set; } = string.Empty;
-
-	public int Cents { get; set; }
-
-	public IList<CoinResult> CoinResults { get; private set; } = new List<CoinResult>();
-
-	public void Convert()
-	{
-		try
-		{
-			if (string.IsNullOrEmpty(DollarValue)) throw new FormatException();
-
-			Cents = CalculateCents(DollarValue);
-			CoinResults = CoinCalculator.CalculateCoinBreakdown(Cents);
-			ShowAlert("Dollar converted with success", Severity.Success);
-		}
-		catch
-		{
-			ShowAlert("The dollar value must be a valid number between 0.00 and 1000.00", Severity.Error);
-			CoinResults.Clear();
-		}
-	}
-
-	void Reset()
-	{
-		DollarValue = string.Empty;
-		Cents = 0;
-		CoinResults.Clear();
-	}
-
-	void ShowAlert(string message, Severity severity)
-	{
-		_snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
-		_snackbar.Add(message, severity, config =>
-		{
-			config.ShowCloseIcon = true;
-		});
-	}
-
-
-	private int CalculateCents(string dollarValue)
-	{
-		decimal dollar = System.Convert.ToDecimal(dollarValue, CultureInfo.InvariantCulture);
-		if (dollar < 0.0M || dollar > 1000.0M)
-			throw new NotSupportedException();
-
-		return (int)Math.Round(dollar * 100);
-	}
+	public DollarToCentConverterViewModel vm = new DollarToCentConverterViewModel();
 }
